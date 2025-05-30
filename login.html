@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+     <link rel="icon" type="image" href="https://i.postimg.cc/3x37zcx6/Plugin-icon-1-2.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>কোষাধ্যক্ষ লগইন</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Base styles for the body and overall layout */
+        body {
+            font-family: 'Hind Siliguri', sans-serif; /* Applied Hind Siliguri font */
+            background-color: #f8f8f8; /* Light background color */
+            display: flex;
+            justify-content: center; /* Center content horizontally */
+            align-items: center; /* Center content vertically */
+            min-height: 100vh; /* Full viewport height */
+            margin: 0;
+            padding: 20px; /* Padding around the container */
+            box-sizing: border-box; /* Include padding in element's total width and height */
+            color: #333; /* Default text color */
+        }
+
+        /* Container for the login/signup forms */
+        .login-container {
+            background-color: #ffffff;
+            padding: 40px 30px; /* Ample padding inside the container */
+            border-radius: 8px; /* Slightly rounded corners */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Soft shadow for depth */
+            width: 100%; /* Full width on smaller screens */
+            max-width: 400px; /* Maximum width for larger screens */
+            text-align: center; /* Center text content inside */
+            box-sizing: border-box; /* Ensure padding doesn't expand width beyond max-width */
+            position: relative; /* For absolute positioning of views */
+            overflow: hidden; /* Hide overflow when views transition */
+        }
+
+        /* Common styles for login and signup views */
+        .auth-view {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: inherit; /* Inherit padding from container */
+            box-sizing: border-box;
+            background-color: #ffffff; /* Ensure background matches container */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .auth-view.hidden {
+            transform: translateX(100%); /* Move off-screen to the right */
+            opacity: 0;
+            pointer-events: none; /* Disable interaction when hidden */
+        }
+
+        .auth-view.active {
+            transform: translateX(0); /* Bring to screen */
+            opacity: 1;
+            position: relative; /* Take up space when active */
+        }
+
+        /* Logo styling */
+        .logo {
+            margin-bottom: 30px; /* Space below the logo */
+        }
+
+        .logo img {
+            max-width: 180px; /* Adjust logo size */
+            height: auto; /* Maintain aspect ratio */
+            display: block; /* Remove extra space below image */
+            margin: 0 auto; /* Center the image */
+        }
+
+        /* Welcome text section */
+        .welcome-text h1 {
+            color: #E87132; /* Red color for the heading */
+            font-size: 2.2em; /* Large font size for emphasis */
+            margin-bottom: 10px; /* Space below heading */
+            font-weight: 700; /* Bold font weight */
+        }
+
+        .welcome-text p {
+            color: #555; /* Slightly darker grey for body text */
+            font-size: 1.1em; /* Readable font size */
+            margin-bottom: 30px; /* Space below paragraph */
+            line-height: 1.5; /* Improve readability */
+        }
+
+        /* Form group for labels and inputs */
+        .form-group {
+            text-align: left; /* Align labels and inputs to the left */
+            margin-bottom: 20px; /* Space between form groups */
+            width: 100%; /* Full width for form groups */
+        }
+
+        .form-group label {
+            display: block; /* Make label take full width */
+            margin-bottom: 8px; /* Space between label and input */
+            color: #333; /* Dark text for labels */
+            font-weight: 600; /* Semi-bold font for labels */
+            font-size: 0.95em; /* Slightly smaller font for labels */
+        }
+
+        /* Wrapper for input field and icon */
+        .input-wrapper {
+            position: relative; /* Allows absolute positioning of the icon */
+        }
+
+        .input-wrapper input {
+            width: calc(100% - 40px); /* Full width minus icon space */
+            padding: 12px 15px 12px 40px; /* Padding for text and icon */
+            border: 1px solid #ddd; /* Light grey border */
+            border-radius: 5px; /* Rounded input corners */
+            font-size: 1em; /* Standard font size */
+            color: #333; /* Input text color */
+            outline: none; /* Remove outline on focus */
+            transition: border-color 0.3s ease; /* Smooth transition for border color */
+            box-sizing: border-box; /* Include padding in input's total width */
+        }
+
+        .input-wrapper input::placeholder {
+            color: #aaa; /* Placeholder text color */
+        }
+
+        .input-wrapper input:focus {
+            border-color: #E87132; /* Red border on focus */
+        }
+
+        /* Icon inside the input field */
+        .input-wrapper .icon {
+            position: absolute;
+            left: 15px; /* Position icon from the left */
+            top: 50%; /* Vertically center icon */
+            transform: translateY(-50%); /* Adjust for perfect vertical centering */
+            color: #aaa; /* Grey color for icons */
+        }
+
+        /* Button styling */
+        .auth-button {
+            background-color: #E87132; /* Red button color */
+            color: #ffffff; /* White text color */
+            padding: 15px 20px; /* Padding inside the button */
+            border: none; /* No border */
+            border-radius: 5px; /* Rounded button corners */
+            font-size: 1.2em; /* Large font size for button text */
+            font-weight: bold; /* Bold text */
+            cursor: pointer; /* Pointer cursor on hover */
+            width: 100%; /* Full width button */
+            transition: background-color 0.3s ease;
+            margin-top: 20px; /* Space above the button */
+        }
+
+        .auth-button:hover {
+            background-color: #E87132; /* Darker red on hover */
+        }
+
+        /* Link styling */
+        .auth-link {
+            display: block; /* Make it a block element to take full width */
+            margin-top: 20px; /* Space above the link */
+            color: #e53935; /* Red color for the link */
+            text-decoration: none; /* No underline by default */
+            font-size: 1em; /* Standard font size */
+            transition: color 0.3s ease; /* Smooth hover effect */
+        }
+
+        .auth-link:hover {
+            text-decoration: underline; /* Underline on hover */
+        }
+
+        .toggle-auth-link {
+            display: block;
+            margin-top: 15px;
+            color: #555;
+            font-size: 0.95em;
+        }
+
+        .toggle-auth-link a {
+            color: #E87132;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .toggle-auth-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Authentication status display */
+        .auth-status {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e0ffe0; /* Light green background for success */
+            border: 1px solid #a0ffa0;
+            border-radius: 8px;
+            display: none; /* Hidden by default */
+            text-align: left;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .auth-status p {
+            margin: 0 0 10px 0;
+            font-size: 1.1em;
+            color: #28a745; /* Green text for success */
+        }
+
+        .auth-status .user-id {
+            font-size: 0.9em;
+            color: #666;
+            word-break: break-all; /* Ensure long IDs wrap */
+        }
+
+        .logout-button {
+            background-color: #6c757d; /* Grey button for logout */
+            color: #ffffff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .logout-button:hover {
+            background-color: #5a6268; /* Darker grey on hover */
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px; /* Reduce overall padding on very small screens */
+            }
+
+            .login-container {
+                padding: 30px 20px; /* Reduce padding inside the container */
+                border-radius: 0; /* Remove border-radius on very small screens for edge-to-edge feel */
+                box-shadow: none; /* Remove shadow on very small screens */
+            }
+
+            .welcome-text h1 {
+                font-size: 2em; /* Adjust heading size */
+            }
+
+            .welcome-text p {
+                font-size: 1em; /* Adjust paragraph size */
+            }
+
+            .input-wrapper input {
+                padding: 10px 15px 10px 40px; /* Adjust input padding */
+            }
+
+            .auth-button {
+                font-size: 1.1em; /* Adjust button font size */
+                padding: 12px 15px; /* Adjust button padding */
+            }
+        }
+
+        @media (max-width: 400px) {
+            .logo img {
+                max-width: 150px; /* Further reduce logo size on very small screens */
+            }
+            .welcome-text h1 {
+                font-size: 1.8em;
+            }
+            .welcome-text p {
+                font-size: 0.95em;
+            }
+        }
+
+        /* Styles for the custom message box (replaces alert) */
+        .custom-message-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); display: flex;
+            justify-content: center; align-items: center; z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .custom-message-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .custom-message-box {
+            background-color: white; padding: 25px; border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); text-align: center;
+            max-width: 300px; width: 90%; font-family: 'Hind Siliguri', sans-serif;
+            color: #333;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .custom-message-overlay.show .custom-message-box {
+            transform: translateY(0);
+        }
+
+        .custom-message-box p {
+            margin-bottom: 20px; font-size: 1.1em;
+        }
+
+        .custom-message-box button {
+            background-color: #e53935; color: white; border: none;
+            padding: 10px 20px; border-radius: 5px; cursor: pointer;
+            font-size: 1em; font-weight: bold; transition: background-color 0.3s ease;
+        }
+
+        .custom-message-box button:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <img src="https://i.postimg.cc/65tYHJtG/logo.png" alt="Mahamaya Logo">
+        </div>
+
+        <div class="auth-view active" id="login-view">
+            <div class="welcome-text">
+                <h1>কোষাধ্যক্ষ পোর্টাল</h1>
+                <p>আপনার কোশাধক্ষ্য ই-মেইল এবং পাসওয়ার্ড দিয়ে লগইন করুন</p>
+            </div>
+            <form class="login-form" id="login-form">
+                <div class="form-group">
+                    <label for="login-email">আপনার ই-মেইল</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope icon"></i>
+                        <input type="email" id="login-email" placeholder="your@gmail.com" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">আপনার পাসওয়ার্ড লিখুন</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock icon"></i>
+                        <input type="password" id="login-password" placeholder="**********" required>
+                    </div>
+                </div>
+                <button type="submit" class="auth-button">লগইন</button>
+                <a href="#" class="auth-link">পাসওয়ার্ড ভুলে গেছেন?</a>
+            </form>
+        </div>
+
+        <div class="auth-view hidden" id="signup-view">
+            <div class="welcome-text">
+                <h1>সাইন আপ করুন!</h1>
+                <p>একটি নতুন অ্যাকাউন্ট তৈরি করতে আপনার তথ্য লিখুন</p>
+            </div>
+            <form class="signup-form" id="signup-form">
+                <div class="form-group">
+                    <label for="signup-email">আপনার ই-মেইল</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope icon"></i>
+                        <input type="email" id="signup-email" placeholder="your@gmail.com" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">একটি পাসওয়ার্ড লিখুন</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock icon"></i>
+                        <input type="password" id="signup-password" placeholder="কমপক্ষে ৬ অক্ষর" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="signup-confirm-password">পাসওয়ার্ড নিশ্চিত করুন</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock icon"></i>
+                        <input type="password" id="signup-confirm-password" placeholder="পাসওয়ার্ড পুনরায় লিখুন" required>
+                    </div>
+                </div>
+                <button type="submit" class="auth-button">সাইন আপ</button>
+                <p class="toggle-auth-link">ইতিমধ্যেই অ্যাকাউন্ট আছে? <a href="#" id="show-login-button">লগইন করুন</a></p>
+            </form>
+        </div>
+
+        <div class="auth-status" id="auth-status">
+            <p>লগইন সফল হয়েছে!</p>
+            <p>ই-মেইল: <span id="user-email"></span></p>
+            <p class="user-id">ইউজার আইডি: <span id="user-id"></span></p>
+            <button class="logout-button" ><a href="index.html" style="text-decoration: none; color: white;">হোমে ফিরে যান</a></button>
+        </div>
+    </div>
+
+    <div class="custom-message-overlay" id="custom-message-overlay">
+        <div class="custom-message-box">
+            <p id="custom-message-text"></p>
+            <button id="custom-message-close-button">ঠিক আছে</button>
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase SDK imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import {
+            getAuth,
+            signInWithEmailAndPassword,
+            createUserWithEmailAndPassword,
+            onAuthStateChanged,
+            signOut,
+            signInAnonymously,
+            signInWithCustomToken
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import {
+            getFirestore,
+            doc,
+            setDoc,
+            getDoc
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables provided by the Canvas environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = {
+              apiKey: "AIzaSyBTpiMYGfO195wKO4mLiUBXNsY3ay-xE2E",
+              authDomain: "casher-server.firebaseapp.com",
+              projectId: "casher-server",
+              storageBucket: "casher-server.firebasestorage.app",
+              messagingSenderId: "1081383530558",
+              appId: "1:1081383530558:web:ebc39c98e4a6495b61e16f"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // DOM Elements for Views
+        const loginView = document.getElementById('login-view');
+        const signupView = document.getElementById('signup-view');
+
+        // DOM Elements for Login Form
+        const loginForm = document.getElementById('login-form');
+        const loginEmailInput = document.getElementById('login-email');
+        const loginPasswordInput = document.getElementById('login-password');
+        const showSignupButton = document.getElementById('show-signup-button');
+
+        // DOM Elements for Signup Form
+        const signupForm = document.getElementById('signup-form');
+        const signupEmailInput = document.getElementById('signup-email');
+        const signupPasswordInput = document.getElementById('signup-password');
+        const signupConfirmPasswordInput = document.getElementById('signup-confirm-password');
+        const showLoginButton = document.getElementById('show-login-button');
+
+        // DOM Elements for Auth Status and Logout
+        const authStatusDiv = document.getElementById('auth-status');
+        const userEmailSpan = document.getElementById('user-email');
+        const userIdSpan = document.getElementById('user-id');
+        const logoutButton = document.getElementById('logout-button');
+
+        // Custom Message Box Elements
+        const customMessageOverlay = document.getElementById('custom-message-overlay');
+        const customMessageText = document.getElementById('custom-message-text');
+        const customMessageCloseButton = document.getElementById('custom-message-close-button');
+
+        // Function to display a custom message box (replaces alert())
+        function showMessageBox(message) {
+            customMessageText.textContent = message;
+            customMessageOverlay.classList.add('show');
+        }
+
+        // Close button for custom message box
+        customMessageCloseButton.addEventListener('click', () => {
+            customMessageOverlay.classList.remove('show');
+        });
+
+        // Function to switch between login and signup views
+        function showView(viewId) {
+            if (viewId === 'login') {
+                loginView.classList.add('active');
+                loginView.classList.remove('hidden');
+                signupView.classList.add('hidden');
+                signupView.classList.remove('active');
+            } else if (viewId === 'signup') {
+                signupView.classList.add('active');
+                signupView.classList.remove('hidden');
+                loginView.classList.add('hidden');
+                loginView.classList.remove('active');
+            }
+        }
+
+        // Handle initial authentication state and listen for changes
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // User is signed in
+                console.log("User is signed in:", user.email, user.uid);
+                loginView.style.display = 'none'; // Hide login view
+                signupView.style.display = 'none'; // Hide signup view
+                authStatusDiv.style.display = 'block'; // Show auth status
+                userEmailSpan.textContent = user.email || 'Anonymous User';
+                userIdSpan.textContent = user.uid;
+
+                // Attempt to save user data to Firestore if it's a new sign-up
+                // This check prevents overwriting existing data on every page load/auth state change
+                const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/user_profiles`, user.uid);
+                try {
+                    const userDocSnap = await getDoc(userDocRef);
+                    if (!userDocSnap.exists()) {
+                        // User profile doesn't exist, create it
+                        await setDoc(userDocRef, {
+                            uid: user.uid,
+                            email: user.email,
+                            createdAt: new Date().toISOString()
+                        });
+                        console.log("User profile saved to Firestore.");
+                    }
+                } catch (firestoreError) {
+                    console.error("Error saving user profile to Firestore:", firestoreError);
+                    showMessageBox(`Firestore Error: ${firestoreError.message}`);
+                }
+
+                // Redirect to index.html after successful login/signup
+                window.location.href = 'index.html'; 
+
+            } else {
+                // User is signed out
+                console.log("User is signed out.");
+                loginView.style.display = 'flex'; // Show login view
+                signupView.style.display = 'flex'; // Show signup view (initially hidden by class)
+                authStatusDiv.style.display = 'none'; // Hide auth status
+                showView('login'); // Default to login view
+
+                // Refined logic for initial sign-in:
+                // Only attempt signInWithCustomToken if __initial_auth_token is defined and not empty.
+                // Otherwise, directly attempt signInAnonymously.
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    try {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                        console.log("Signed in with custom token.");
+                    } catch (error) {
+                        console.error("Error signing in with custom token (falling back to anonymous):", error);
+                        // If custom token fails (e.g., mismatch), try anonymous
+                        try {
+                            await signInAnonymously(auth);
+                            console.log("Signed in anonymously after custom token failure.");
+                        } catch (anonError) {
+                            console.error("Error signing in anonymously:", anonError);
+                            showMessageBox(`Authentication Error: ${anonError.message}`);
+                        }
+                    }
+                } else {
+                    // If no custom token is provided, sign in anonymously directly
+                    try {
+                        await signInAnonymously(auth);
+                        console.log("Signed in anonymously.");
+                    } catch (error) {
+                        console.error("Error signing in anonymously:", error);
+                        showMessageBox(`Authentication Error: ${error.message}`);
+                    }
+                }
+            }
+        });
+
+        // Login functionality
+        if (loginForm) {
+            loginForm.addEventListener('submit', async (event) => {
+                event.preventDefault(); // Prevent default form submission
+
+                const email = loginEmailInput.value.trim();
+                const password = loginPasswordInput.value.trim();
+
+                if (email === '' || password === '') {
+                    showMessageBox('অনুগ্রহ করে আপনার ই-মেইল এবং পাসওয়ার্ড লিখুন।'); // Please enter your email and password.
+                    return;
+                }
+
+                try {
+                    await signInWithEmailAndPassword(auth, email, password);
+                } catch (error) {
+                    console.error("Login Error:", error.code, error.message);
+                    let errorMessage = 'লগইন ব্যর্থ হয়েছে।'; // Login failed.
+                    switch (error.code) {
+                        case 'auth/invalid-email':
+                            errorMessage = 'ভুল ই-মেইল ফরম্যাট।'; // Invalid email format.
+                            break;
+                        case 'auth/user-not-found':
+                        case 'auth/wrong-password':
+                            errorMessage = 'ভুল ই-মেইল বা পাসওয়ার্ড।'; // Wrong email or password.
+                            break;
+                        case 'auth/too-many-requests':
+                            errorMessage = 'অনেকবার চেষ্টা করা হয়েছে। পরে আবার চেষ্টা করুন।'; // Too many attempts. Try again later.
+                            break;
+                        default:
+                            errorMessage = `লগইন ব্যর্থ হয়েছে: ${error.message}`; // Login failed: [error message]
+                            break;
+                    }
+                    showMessageBox(errorMessage);
+                }
+            });
+        }
+
+        // Sign Up functionality
+        if (signupForm) {
+            signupForm.addEventListener('submit', async (event) => {
+                event.preventDefault(); // Prevent default form behavior
+
+                const email = signupEmailInput.value.trim();
+                const password = signupPasswordInput.value.trim();
+                const confirmPassword = signupConfirmPasswordInput.value.trim();
+
+                if (email === '' || password === '' || confirmPassword === '') {
+                    showMessageBox('সাইন আপ করতে সব ঘর পূরণ করুন।'); // Please fill in all fields to sign up.
+                    return;
+                }
+
+                if (password.length < 6) {
+                    showMessageBox('পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।'); // Password must be at least 6 characters.
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    showMessageBox('পাসওয়ার্ড মিলছে না।'); // Passwords do not match.
+                    return;
+                }
+
+                try {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+
+                    // Save user data to Firestore
+                    const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}/user_profiles`, user.uid);
+                    await setDoc(userDocRef, {
+                        uid: user.uid,
+                        email: user.email,
+                        createdAt: new Date().toISOString()
+                    });
+
+                    showMessageBox('সাইন আপ সফল হয়েছে! এখন আপনি লগইন করতে পারবেন।'); // Sign up successful! You can now log in.
+                    // onAuthStateChanged listener will handle UI update on successful sign-up (auto-login)
+                } catch (error) {
+                    console.error("Sign Up Error:", error.code, error.message);
+                    let errorMessage = 'সাইন আপ ব্যর্থ হয়েছে।'; // Sign up failed.
+                    switch (error.code) {
+                        case 'auth/email-already-in-use':
+                            errorMessage = 'এই ই-মেইলটি ইতিমধ্যেই ব্যবহৃত হয়েছে।'; // This email is already in use.
+                            break;
+                        case 'auth/invalid-email':
+                            errorMessage = 'ভুল ই-মেইল ফরম্যাট।'; // Invalid email format.
+                            break;
+                        case 'auth/weak-password':
+                            errorMessage = 'পাসওয়ার্ড খুব দুর্বল। কমপক্ষে ৬ অক্ষরের হতে হবে।'; // Password is too weak. Must be at least 6 characters.
+                            break;
+                        default:
+                            errorMessage = `সাইন আপ ব্যর্থ হয়েছে: ${error.message}`; // Sign up failed: [error message]
+                            break;
+                    }
+                    showMessageBox(errorMessage);
+                }
+            });
+        }
+
+        // Logout functionality
+        if (logoutButton) {
+            logoutButton.addEventListener('click', async () => {
+                try {
+                    await signOut(auth);
+                    showMessageBox('সফলভাবে লগআউট করা হয়েছে।'); // Successfully logged out.
+                    // onAuthStateChanged listener will handle UI update
+                } catch (error) {
+                    console.error("Logout Error:", error.message);
+                    showMessageBox(`লগআউট ব্যর্থ হয়েছে: ${error.message}`); // Logout failed: [error message]
+                }
+            });
+        }
+
+        // Toggle between login and signup views
+        if (showSignupButton) {
+            showSignupButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                showView('signup');
+            });
+        }
+
+        if (showLoginButton) {
+            showLoginButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                showView('login');
+            });
+        }
+    </script>
+</body>
+</html>
