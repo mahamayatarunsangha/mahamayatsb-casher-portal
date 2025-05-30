@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Mahamaya</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        />
+        <style>
+            /* CSS Styling */
+            @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap");
+            @import url("https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap");
+
+            :root {
+                --primary-red: #E87132;
+                --light-gray: #f5f5f5;
+                --dark-text: #333333;
+                --medium-gray: #777777;
+                --border-color: #e0e0e0;
+            }
+
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                font-family: "Hind Siliguri", "Noto Sans Bengali", sans-serif; /* Added Hind Siliguri as primary */
+                background-color: var(--light-gray);
+                color: var(--dark-text);
+                line-height: 1.6;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            .container {
+                max-width: 450px; /* Typical mobile screen width, adjust as needed */
+                margin: 0 auto;
+                background-color: #ffffff;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                position: relative; /* For fixed bottom nav */
+            }
+
+            /* Header */
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 15px;
+                background-color: #ffffff;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .logo {
+                display: flex;
+                align-items: center;
+                font-size: 1.2em;
+                font-weight: 700;
+                color: var(--primary-red);
+            }
+
+            .logo img {
+                margin-right: 8px;
+                width: 76px; /* Ensure consistent size */
+                height: 48px; /* Ensure consistent size */
+
+            }
+
+            .logo span:last-child {
+                font-size: 0.8em;
+                font-weight: 500;
+                color: var(--medium-gray);
+                margin-left: 5px;
+            }
+
+            .header-icons {
+                display: flex;
+                align-items: center;
+            }
+
+            .header-icons .fa-bell {
+                font-size: 1.4em;
+                color: var(--medium-gray);
+                margin-right: 15px;
+            }
+
+            .header-icons .user-profile {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+
+            /* Section Header (common for sections) */
+            .section-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 15px;
+                background-color: #ffffff;
+                margin-top: 10px;
+            }
+
+            .section-header h3 {
+                font-size: 1.1em;
+                font-weight: 600;
+                color: var(--dark-text);
+            }
+
+            .section-header a {
+                text-decoration: none;
+                color: var(--primary-red);
+                font-size: 0.9em;
+                font-weight: 500;
+            }
+
+            /* Features and Services */
+            .features-services .grid-container {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+                padding: 15px;
+                background-color: #ffffff;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .grid-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 8px;
+                text-decoration: none; /* Remove underline from anchor tags */
+                color: inherit; /* Inherit color from parent */
+                padding: 10px 5px; /* Add padding to make it a larger clickable area */
+                border-radius: 8px;
+                transition:
+                    background-color 0.2s ease,
+                    transform 0.2s ease;
+            }
+
+            .grid-item:hover {
+                background-color: var(--light-gray);
+                transform: translateY(-2px);
+            }
+
+            .grid-item:active {
+                background-color: #e0e0e0;
+                transform: translateY(0);
+            }
+
+            .icon-circle {
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                background-color: var(--light-gray);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+
+            .icon-circle i {
+                font-size: 1.8em;
+                color: var(--primary-red);
+            }
+
+            .grid-item p {
+                font-size: 0.85em;
+                color: var(--dark-text);
+                font-weight: 500;
+            }
+
+            /* Carousel Styling (General) */
+            .carousel-container {
+                position: relative;
+                width: 90%;
+                margin: 0 auto;
+                overflow: hidden;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .carousel-slide {
+                display: none; /* Hidden by default, JS manages visibility */
+                width: 100%;
+                animation: fadeIn 0.5s ease-in-out; /* Smooth transition for slides */
+            }
+
+            .carousel-slide.active {
+                display: block;
+            }
+
+            .carousel-slide img {
+                width: 100%;
+                height: auto;
+                display: block;
+                border-radius: 10px; /* Match container border-radius */
+            }
+
+            .carousel-dots {
+                display: flex;
+                justify-content: center;
+                margin-top: 15px;
+                gap: 8px;
+            }
+
+            .dot {
+                height: 8px;
+                width: 8px;
+                background-color: var(--border-color);
+                border-radius: 50%;
+                display: inline-block;
+                cursor: pointer;
+                transition: background-color 0.3s ease; /* Smooth transition for dots */
+            }
+
+            .dot.active {
+                background-color: var(--primary-red);
+            }
+
+            /* Keyframe animation for carousel slide */
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                }
+                to {
+                    opacity: 1;
+                }
+            }
+
+            /* Upcoming Events Section */
+            .upcoming-events {
+                margin-top: 10px;
+                background-color: #ffffff;
+                padding-bottom: 15px;
+            }
+
+            /* Past Activities Section */
+            .past-activities {
+                flex-grow: 1; /* Pushes the bottom nav to the bottom */
+                padding-bottom: 70px; /* Space for the fixed bottom nav */
+                background-color: #ffffff;
+                margin-top: 10px;
+            }
+
+            /* Bottom Navigation */
+            .bottom-nav {
+                position: fixed;
+                bottom: 0;
+                left: 50%; /* Center horizontally */
+                transform: translateX(-50%); /* Adjust for its own width */
+                width: 100%;
+                max-width: 450px; /* Match container max-width */
+                background-color: #ffffff;
+                display: flex;
+                justify-content: space-around;
+                padding: 10px 0;
+                border-top: 1px solid var(--border-color);
+                box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+                z-index: 1000; /* Ensure it stays on top */
+            }
+
+            .nav-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-decoration: none;
+                color: var(--medium-gray);
+                font-size: 0.75em;
+                font-weight: 500;
+                gap: 4px;
+                flex: 1; /* Distribute space evenly */
+                padding: 5px 0; /* Add some padding for touch target */
+                transition:
+                    color 0.3s ease,
+                    background-color 0.2s ease,
+                    transform 0.2s ease; /* Added transitions */
+                border-radius: 8px; /* Added border-radius for button feel */
+            }
+
+            .nav-item:hover:not(.active-nav-item) {
+                /* Exclude active item from hover effect */
+                background-color: var(--light-gray);
+                transform: translateY(-2px);
+            }
+
+            .nav-item:active:not(.active-nav-item) {
+                /* Exclude active item from active effect */
+                background-color: #e0e0e0;
+                transform: translateY(0);
+            }
+
+            .nav-item i {
+                font-size: 1.4em;
+            }
+
+            .nav-item.active-nav-item {
+                color: var(--primary-red);
+            }
+
+            /* Center home button styling */
+            .active-nav-item i {
+                background-color: var(--primary-red);
+                color: white;
+                width: 55px;
+                height: 55px;
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                position: relative;
+                top: -20px; /* Lift it up */
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                border: 4px solid #ffffff; /* White border */
+                transition: all 0.3s ease;
+            }
+
+            .active-nav-item span {
+                position: relative;
+                top: -15px; /* Adjust text position */
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <header class="header">
+                <div class="logo">
+                    <img
+                        src="https://i.postimg.cc/65tYHJtG/logo.png"
+                        alt="Mahamaya Logo"/>
+                    <span>ক্যাশিয়ার পোর্টাল</span>
+                </div>
+                <div class="header-icons">
+                    <i class="fas fa-bell"></i>
+                    <img
+                        src="https://img.freepik.com/free-vector/smiling-young-man-illustration_1308-173524.jpg"
+                        alt="User Profile"
+                        class="user-profile"
+                    />
+                </div>
+            </header>
+
+            <section class="features-services">
+                <div class="section-header">
+                    <h3>ফিচার এবং সার্ভিস</h3>
+
+                </div>
+                <div class="grid-container">
+                    <a href="deposit-entry.html" class="grid-item" role="button" tabindex="0">
+                        <div class="icon-circle">
+                            <i class="fa-solid fa-circle-plus"></i>
+                        </div>
+                        <p>জমা এন্ট্রি</p>
+                    </a>
+                    <a href="expense-entry.html" class="grid-item" role="button" tabindex="0">
+                        <div class="icon-circle">
+                            <i class="fa-solid fa-circle-minus"></i>
+                        </div>
+                        <p>খরচ এন্ট্রি</p>
+                    </a>
+                    <a href="deposits.html" class="grid-item" role="button" tabindex="0">
+                        <div class="icon-circle">
+                            <i class="fa-solid fa-money-bill"></i>
+                        </div>
+                        <p>জমার বিবরণ</p>
+                    </a>
+                    <a href="expenses.html" class="grid-item" role="button" tabindex="0">
+                        <div class="icon-circle">
+                            <i class="fa-solid fa-folder-minus"></i>
+                        </div>
+                        <p>খরচের বিবরণ</p>
+                    </a>
+                </div>
+            </section>
+
+            </section>
+
+            
+
+            <nav class="bottom-nav">
+                <a href="#" class="nav-item" role="button" tabindex="0">
+                    <i class="fas fa-hand-holding-medical"></i>
+                    <span>রক্ত দানকারী</span>
+                </a>
+                <a href="#" class="nav-item" role="button" tabindex="0">
+                    <i class="fas fa-comments"></i>
+                    <span>চ্যাট সাপোর্ট</span>
+                </a>
+                 <a href="#" class="nav-item" role="button" tabindex="0">
+                    <i class="fas fa-home"></i>
+                    <span>হোম</span>
+                </a>
+                <a 
+                    class="nav-item active-nav-item"
+                    role="button"
+                    tabindex="0"
+                    
+                    href="#" class="nav-item" role="button" tabindex="0">
+                    <i class="fa-solid fa-door-open"></i>
+                    <span>পোর্টাল</span>
+                </a>
+                <a href="more.html" class="nav-item" role="button" tabindex="0">
+                    <i class="fas fa-bars"></i>
+                    <span>আরও</span>
+                </a>
+            </nav>
+        </div>
+
+        <script>
+            // JavaScript for Carousel Functionality
+            document.addEventListener("DOMContentLoaded", () => {
+                // Function to manage a single carousel
+                function setupCarousel(containerId, dotsId) {
+                    const slides = document.querySelectorAll(
+                        `#${containerId} .carousel-slide`,
+                    );
+                    const dots = document.querySelectorAll(`#${dotsId} .dot`);
+                    let currentSlide = 0;
+                    let slideInterval;
+
+                    // Function to display a specific slide
+                    function showSlide(index) {
+                        slides.forEach((slide) =>
+                            slide.classList.remove("active"),
+                        );
+                        dots.forEach((dot) => dot.classList.remove("active"));
+
+                        if (slides[index]) {
+                            slides[index].classList.add("active");
+                        }
+                        if (dots[index]) {
+                            dots[index].classList.add("active");
+                        }
+                    }
+
+                    // Function to advance to the next slide
+                    function nextSlide() {
+                        currentSlide = (currentSlide + 1) % slides.length;
+                        showSlide(currentSlide);
+                    }
+
+                    // Function to start the auto-advance carousel
+                    function startCarousel() {
+                        clearInterval(slideInterval); // Clear any existing interval
+                        slideInterval = setInterval(nextSlide, 3000); // Change slide every 3 seconds
+                    }
+
+                    // Manual dot navigation
+                    dots.forEach((dot, index) => {
+                        dot.addEventListener("click", () => {
+                            currentSlide = index;
+                            showSlide(currentSlide);
+                            startCarousel(); // Restart the auto-advance timer
+                        });
+                    });
+
+                    // Initialize the first slide and start the carousel
+                    showSlide(currentSlide);
+                    startCarousel();
+                }
+
+                // Setup the "Upcoming Events" carousel
+                setupCarousel("upcomingCarousel", "upcomingDots");
+
+                // Setup the "Past Activities" carousel
+                setupCarousel("pastActivitiesCarousel", "pastActivitiesDots");
+            });
+        </script>
+    </body>
+</html>
