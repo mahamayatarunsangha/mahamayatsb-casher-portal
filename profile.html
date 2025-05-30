@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <link rel="icon" type="image" href="https://i.postimg.cc/3x37zcx6/Plugin-icon-1-2.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>কোষাধ্যক্ষ প্রোফাইল</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Base styles for the body and overall layout */
+        body {
+            font-family: 'Hind Siliguri', sans-serif; /* Applied Hind Siliguri font */
+            background-color: #fcefe7; /* Light background color */
+            display: flex;
+            justify-content: center; /* Center content horizontally */
+            align-items: center; /* Center content vertically */
+            min-height: 100vh; /* Full viewport height */
+            margin: 0;
+            padding: 20px; /* Padding around the container */
+            box-sizing: border-box; /* Include padding in element's total width and height */
+            color: #333; /* Default text color */
+        }
+
+        /* Container for the login/signup/profile forms */
+        .login-container {
+            background-color: #ffffff;
+            padding: 40px 30px; /* Ample padding inside the container */
+            border-radius: 8px; /* Slightly rounded corners */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Soft shadow for depth */
+            width: 100%; /* Full width on smaller screens */
+            max-width: 400px; /* Maximum width for larger screens */
+            text-align: center; /* Center text content inside */
+            box-sizing: border-box; /* Ensure padding doesn't expand width beyond max-width */
+            position: relative; /* For absolute positioning of views */
+            overflow: hidden; /* Hide overflow when views transition */
+            min-height: 500px; /* Ensure container has enough height for content */
+        }
+
+        /* Common styles for auth views (login, signup, profile) */
+        .auth-view {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: inherit; /* Inherit padding from container */
+            box-sizing: border-box;
+            background-color: #ffffff; /* Ensure background matches container */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Align content to top */
+            align-items: center;
+            overflow-y: auto; /* Enable scrolling for profile page */
+        }
+
+        /* Specific styles for hidden views (to completely remove from layout) */
+        .auth-view.completely-hidden {
+            display: none !important;
+        }
+
+        .auth-view.hidden {
+            transform: translateX(100%); /* Move off-screen to the right */
+            opacity: 0;
+            pointer-events: none; /* Disable interaction when hidden */
+        }
+
+        .auth-view.active {
+            transform: translateX(0); /* Bring to screen */
+            opacity: 1;
+            position: relative; /* Take up space when active */
+        }
+
+        /* Logo styling */
+        .logo {
+            margin-bottom: 30px; /* Space below the logo */
+        }
+
+        .logo img {
+            max-width: 180px; /* Adjust logo size */
+            height: auto; /* Maintain aspect ratio */
+            display: block; /* Remove extra space below image */
+            margin: 0 auto; /* Center the image */
+        }
+
+        /* Welcome text section */
+        .welcome-text h1 {
+            color: #E87132; /* Red color for the heading */
+            font-size: 2.2em; /* Large font size for emphasis */
+            margin-bottom: 10px; /* Space below heading */
+            font-weight: 700; /* Bold font weight */
+        }
+
+        .welcome-text p {
+            color: #555; /* Slightly darker grey for body text */
+            font-size: 1.1em; /* Readable font size */
+            margin-bottom: 30px; /* Space below paragraph */
+            line-height: 1.5; /* Improve readability */
+        }
+
+        /* Form group for labels and inputs */
+        .form-group {
+            text-align: left; /* Align labels and inputs to the left */
+            margin-bottom: 20px; /* Space between form groups */
+            width: 100%; /* Full width for form groups */
+        }
+
+        .form-group label {
+            display: block; /* Make label take full width */
+            margin-bottom: 8px; /* Space between label and input */
+            color: #333; /* Dark text for labels */
+            font-weight: 600; /* Semi-bold font for labels */
+            font-size: 0.95em; /* Slightly smaller font for labels */
+        }
+
+        /* Wrapper for input field and icon */
+        .input-wrapper {
+            position: relative; /* Allows absolute positioning of the icon */
+        }
+
+        .input-wrapper input, .input-wrapper select {
+            width: calc(100% - 40px); /* Full width minus icon space */
+            padding: 12px 15px 12px 40px; /* Padding for text and icon */
+            border: 1px solid #ddd; /* Light grey border */
+            border-radius: 5px; /* Rounded input corners */
+            font-size: 1em; /* Standard font size */
+            color: #333; /* Input text color */
+            outline: none; /* Remove outline on focus */
+            transition: border-color 0.3s ease; /* Smooth transition for border color */
+            box-sizing: border-box; /* Include padding in input's total width */
+            -webkit-appearance: none; /* Remove default select styling */
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        .input-wrapper select {
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23aaa%22%20d%3D%22M287%2C197.4L159.3%2C69.7c-4.7-4.7-12.3-4.7-17%2C0L5.4%2C197.4c-4.7%2C4.7-4.7%2C12.3%2C0%2C17l8.5%2C8.5c4.7%2C4.7%2C12.3%2C4.7%2C17%2C0l118.3-118.3l118.3%2C118.3c4.7%2C4.7%2C12.3%2C4.7%2C17%2C0l8.5-8.5C291.7%2C209.7%2C291.7%2C202.1%2C287%2C197.4z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 15px top 50%;
+            background-size: 12px auto;
+        }
+
+
+        .input-wrapper input::placeholder {
+            color: #aaa; /* Placeholder text color */
+        }
+
+        .input-wrapper input:focus, .input-wrapper select:focus {
+            border-color: #e53935; /* Red border on focus */
+        }
+
+        /* Icon inside the input field */
+        .input-wrapper .icon {
+            position: absolute;
+            left: 15px; /* Position icon from the left */
+            top: 50%; /* Vertically center icon */
+            transform: translateY(-50%); /* Adjust for perfect vertical centering */
+            color: #aaa; /* Grey color for icons */
+        }
+
+        /* Button styling */
+        .auth-button {
+            background-color: #E87132; /* Red button color */
+            color: #ffffff; /* White text color */
+            padding: 15px 20px; /* Padding inside the button */
+            border: none; /* No border */
+            border-radius: 5px; /* Rounded button corners */
+            font-size: 1.2em; /* Large font size for button text */
+            font-weight: bold; /* Bold text */
+            cursor: pointer; /* Pointer cursor on hover */
+            width: 100%; /* Full width button */
+            transition: background-color 0.3s ease;
+            margin-top: 20px; /* Space above the button */
+        }
+
+        .auth-button:hover {
+            background-color: #d32f2f; /* Darker red on hover */
+        }
+
+        /* Link styling */
+        .auth-link {
+            display: block; /* Make it a block element to take full width */
+            margin-top: 20px; /* Space above the link */
+            color: #e53935; /* Red color for the link */
+            text-decoration: none; /* No underline by default */
+            font-size: 1em; /* Standard font size */
+            transition: color 0.3s ease; /* Smooth hover effect */
+        }
+
+        .auth-link:hover {
+            text-decoration: underline; /* Underline on hover */
+        }
+
+        .toggle-auth-link {
+            display: block;
+            margin-top: 15px;
+            color: #555;
+            font-size: 0.95em;
+        }
+
+        .toggle-auth-link a {
+            color: #e53935;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .toggle-auth-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Authentication status display */
+        .auth-status {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e0ffe0; /* Light green background for success */
+            border: 1px solid #a0ffa0;
+            border-radius: 8px;
+            display: none; /* Hidden by default */
+            text-align: left;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .auth-status p {
+            margin: 0 0 10px 0;
+            font-size: 1.1em;
+            color: #28a745; /* Green text for success */
+        }
+
+        .auth-status .user-id {
+            font-size: 0.9em;
+            color: #666;
+            word-break: break-all; /* Ensure long IDs wrap */
+        }
+
+        .logout-button {
+            background-color: #6c757d; /* Grey button for logout */
+            color: #ffffff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 15px;
+            margin-right: 10px; /* Space between logout and profile button */
+        }
+
+        .logout-button:hover {
+            background-color: #5a6268; /* Darker grey on hover */
+        }
+
+        .profile-button {
+            background-color: #007bff; /* Blue button for profile */
+            color: #ffffff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .profile-button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px; /* Reduce overall padding on very small screens */
+            }
+
+            .login-container {
+                padding: 30px 20px; /* Reduce padding inside the container */
+                border-radius: 0; /* Remove border-radius on very small screens for edge-to-edge feel */
+                box-shadow: none; /* Remove shadow on very small screens */
+            }
+
+            .welcome-text h1 {
+                font-size: 2em; /* Adjust heading size */
+            }
+
+            .welcome-text p {
+                font-size: 1em; /* Adjust paragraph size */
+            }
+
+            .input-wrapper input, .input-wrapper select {
+                padding: 10px 15px 10px 40px; /* Adjust input padding */
+            }
+
+            .auth-button {
+                font-size: 1.1em; /* Adjust button font size */
+                padding: 12px 15px; /* Adjust button padding */
+            }
+        }
+
+        @media (max-width: 400px) {
+            .logo img {
+                max-width: 150px; /* Further reduce logo size on very small screens */
+            }
+            .welcome-text h1 {
+                font-size: 1.8em;
+            }
+            .welcome-text p {
+                font-size: 0.95em;
+            }
+        }
+
+        /* Styles for the custom message box (replaces alert) */
+        .custom-message-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); display: flex;
+            justify-content: center; align-items: center; z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .custom-message-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .custom-message-box {
+            background-color: white; padding: 25px; border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); text-align: center;
+            max-width: 300px; width: 90%; font-family: 'Hind Siliguri', sans-serif;
+            color: #333;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .custom-message-overlay.show .custom-message-box {
+            transform: translateY(0);
+        }
+
+        .custom-message-box p {
+            margin-bottom: 20px; font-size: 1.1em;
+        }
+
+        .custom-message-box button {
+            background-color: #e53935; color: white; border: none;
+            padding: 10px 20px; border-radius: 5px; cursor: pointer;
+            font-size: 1em; font-weight: bold; transition: background-color 0.3s ease;
+        }
+
+        .custom-message-box button:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <img src="https://i.postimg.cc/65tYHJtG/logo.png" alt="Mahamaya Logo">
+        </div>
+
+        <div class="auth-view active" id="login-view">
+            <div class="welcome-text">
+                <h1>স্বাগতম!</h1>
+                <p>আপনার কোশাধক্ষ্য ই-মেইল এবং পাসওয়ার্ড দিয়ে লগইন করুন</p>
+            </div>
+            <form class="login-form" id="login-form">
+                <div class="form-group">
+                    <label for="login-email">আপনার ই-মেইল</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope icon"></i>
+                        <input type="email" id="login-email" placeholder="your@gmail.com" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">আপনার পাসওয়ার্ড লিখুন</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock icon"></i>
+                        <input type="password" id="login-password" placeholder="**********" required>
+                    </div>
+                </div>
+                <button type="submit" class="auth-button">লগইন</button>
+                <a href="#" class="auth-link">পাসওয়ার্ড ভুলে গেছেন?</a>
+            </form>
+        </div>
+
+        <div class="auth-view hidden" id="signup-view">
+            <div class="welcome-text">
+                <h1>সাইন আপ করুন!</h1>
+                <p>একটি নতুন অ্যাকাউন্ট তৈরি করতে আপনার তথ্য লিখুন</p>
+            </div>
+            <form class="signup-form" id="signup-form">
+                <div class="form-group">
+                    <label for="signup-email">আপনার ই-মেইল</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope icon"></i>
+                        <input type="email" id="signup-email" placeholder="your@gmail.com" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">একটি পাসওয়ার্ড লিখুন</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock icon"></i>
+                        <input type="password" id="signup-password" placeholder="কমপক্ষে ৬ অক্ষর" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="signup-confirm-password">পাসওয়ার্ড নিশ্চিত করুন</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock icon"></i>
+                        <input type="password" id="signup-confirm-password" placeholder="পাসওয়ার্ড পুনরায় লিখুন" required>
+                    </div>
+                </div>
+                <button type="submit" class="auth-button">সাইন আপ</button>
+                <p class="toggle-auth-link">ইতিমধ্যেই অ্যাকাউন্ট আছে? <a href="#" id="show-login-button">লগইন করুন</a></p>
+            </form>
+        </div>
+
+        <div class="auth-view hidden" id="profile-view">
+            <div class="welcome-text">
+                <h1>প্রোফাইল</h1>
+                <p>আপনার প্রোফাইল তথ্য সম্পাদনা করুন</p>
+            </div>
+            <form class="profile-form" id="profile-form">
+                <div class="form-group">
+                    <label for="profile-name">নাম</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user icon"></i>
+                        <input type="text" id="profile-name" placeholder="আপনার পুরো নাম">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="profile-phone">ফোন নম্বর</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-phone icon"></i>
+                        <input type="tel" id="profile-phone" placeholder="উদাহরণ: ০১৭xxxxxxxx">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="profile-blood-group">রক্তের গ্রুপ</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-tint icon"></i>
+                        <select id="profile-blood-group">
+                            <option value="">নির্বাচন করুন</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="profile-blood-donation-interest">রক্ত দান করতে আগ্রহী?</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-hand-holding-heart icon"></i>
+                        <select id="profile-blood-donation-interest">
+                            <option value="">নির্বাচন করুন</option>
+                            <option value="হ্যাঁ">হ্যাঁ</option>
+                            <option value="না">না</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="profile-address">ঠিকানা</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-map-marker-alt icon"></i>
+                        <input type="text" id="profile-address" placeholder="আপনার ঠিকানা">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="profile-father-name">বাবার নাম</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-male icon"></i>
+                        <input type="text" id="profile-father-name" placeholder="আপনার বাবার নাম">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="profile-mother-name">মায়ের নাম</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-female icon"></i>
+                        <input type="text" id="profile-mother-name" placeholder="আপনার মায়ের নাম">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="profile-gender">লিঙ্গ</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-venus-mars icon"></i>
+                        <select id="profile-gender">
+                            <option value="">নির্বাচন করুন</option>
+                            <option value="পুরুষ">পুরুষ</option>
+                            <option value="মহিলা">মহিলা</option>
+                            <option value="অন্যান্য">অন্যান্য</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="profile-occupation">পেশা</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-briefcase icon"></i>
+                        <input type="text" id="profile-occupation" placeholder="আপনার পেশা">
+                    </div>
+                </div>
+                <button type="submit" class="auth-button">প্রোফাইল সংরক্ষণ করুন</button>
+                </form>
+        </div>
+
+        <div class="auth-status" id="auth-status">
+            <p>লগইন সফল হয়েছে!</p>
+            <p>ই-মেইল: <span id="user-email"></span></p>
+            <p class="user-id">ইউজার আইডি: <span id="user-id"></span></p>
+            <div style="display: flex; justify-content: center; gap: 10px;">
+                <button class="logout-button" id="logout-button">লগআউট</button>
+                <button class="profile-button"><a href="index.html" style="text-decoration: none; color: white;">হোমে ফিরে যান</a></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="custom-message-overlay" id="custom-message-overlay">
+        <div class="custom-message-box">
+            <p id="custom-message-text"></p>
+            <button id="custom-message-close-button">ঠিক আছে</button>
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase SDK imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import {
+            getAuth,
+            signInWithEmailAndPassword,
+            createUserWithEmailAndPassword,
+            onAuthStateChanged,
+            signOut,
+            signInAnonymously,
+            signInWithCustomToken
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import {
+            getDatabase, // Import Realtime Database
+            ref,         // Import ref for database references
+            set,         // Import set for writing data
+            get,         // Import get for reading data
+            child        // Import child for navigating paths
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js"; // Realtime Database SDK URL
+
+        // Global variables provided by the Canvas environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTpiMYGfO195wKO4mLiUBXNsY3ay-xE2E",
+              authDomain: "casher-server.firebaseapp.com",
+              projectId: "casher-server",
+              storageBucket: "casher-server.firebasestorage.app",
+              messagingSenderId: "1081383530558",
+              appId: "1:1081383530558:web:ebc39c98e4a6495b61e16f"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app); // Initialize Realtime Database
+
+        // DOM Elements for Views
+        const loginView = document.getElementById('login-view');
+        const signupView = document.getElementById('signup-view');
+        const profileView = document.getElementById('profile-view');
+
+        // DOM Elements for Login Form
+        const loginForm = document.getElementById('login-form');
+        const loginEmailInput = document.getElementById('login-email');
+        const loginPasswordInput = document.getElementById('login-password');
+        const showSignupButton = document.getElementById('show-signup-button');
+
+        // DOM Elements for Signup Form
+        const signupForm = document.getElementById('signup-form');
+        const signupEmailInput = document.getElementById('signup-email');
+        const signupPasswordInput = document.getElementById('signup-password');
+        const signupConfirmPasswordInput = document.getElementById('signup-confirm-password');
+        const showLoginButton = document.getElementById('show-login-button');
+
+        // DOM Elements for Profile Form
+        const profileForm = document.getElementById('profile-form');
+        const profileNameInput = document.getElementById('profile-name');
+        const profilePhoneInput = document.getElementById('profile-phone');
+        const profileBloodGroupSelect = document.getElementById('profile-blood-group');
+        const profileBloodDonationInterestSelect = document.getElementById('profile-blood-donation-interest');
+        const profileAddressInput = document.getElementById('profile-address');
+        const profileFatherNameInput = document.getElementById('profile-father-name');
+        const profileMotherNameInput = document.getElementById('profile-mother-name');
+        const profileGenderSelect = document.getElementById('profile-gender');
+        const profileOccupationInput = document.getElementById('profile-occupation');
+        // const backToAuthStatusButton = document.getElementById('back-to-auth-status'); // Removed
+
+        // DOM Elements for Auth Status and Logout
+        const authStatusDiv = document.getElementById('auth-status');
+        const userEmailSpan = document.getElementById('user-email');
+        const userIdSpan = document.getElementById('user-id');
+        const logoutButton = document.getElementById('logout-button');
+        const viewProfileButton = document.getElementById('view-profile-button');
+
+        // Custom Message Box Elements
+        const customMessageOverlay = document.getElementById('custom-message-overlay');
+        const customMessageText = document.getElementById('custom-message-text');
+        const customMessageCloseButton = document.getElementById('custom-message-close-button');
+
+        // Function to display a custom message box (replaces alert())
+        function showMessageBox(message) {
+            customMessageText.textContent = message;
+            customMessageOverlay.classList.add('show');
+        }
+
+        // Close button for custom message box
+        customMessageCloseButton.addEventListener('click', () => {
+            customMessageOverlay.classList.remove('show');
+        });
+
+        // Function to switch between different views
+        function showView(viewId) {
+            // Hide all views completely first
+            loginView.classList.add('completely-hidden');
+            loginView.classList.remove('active', 'hidden');
+            signupView.classList.add('completely-hidden');
+            signupView.classList.remove('active', 'hidden');
+            profileView.classList.add('completely-hidden');
+            profileView.classList.remove('active', 'hidden');
+            authStatusDiv.style.display = 'none';
+
+            // Show the requested view
+            if (viewId === 'login') {
+                loginView.classList.remove('completely-hidden');
+                loginView.classList.add('active');
+            } else if (viewId === 'signup') {
+                signupView.classList.remove('completely-hidden');
+                signupView.classList.add('active');
+            } else if (viewId === 'profile') {
+                profileView.classList.remove('completely-hidden');
+                profileView.classList.add('active');
+                authStatusDiv.style.display = 'block'; // Keep auth status visible on profile page
+            } else if (viewId === 'authStatus') {
+                // This state is now primarily managed by the profile view being active
+                // Or by the login view being active when logged out.
+                // This 'authStatus' view will mostly be the initial state when logged in.
+                authStatusDiv.style.display = 'block';
+                profileView.classList.remove('completely-hidden'); // Show profile by default when logged in
+                profileView.classList.add('active');
+            }
+        }
+
+        // Function to load user profile data from Realtime Database
+        async function loadUserProfile(uid) {
+            const userProfileRef = ref(database, `artifacts/${appId}/users/${uid}/user_profiles`);
+            try {
+                const snapshot = await get(userProfileRef);
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    profileNameInput.value = data.name || '';
+                    profilePhoneInput.value = data.phoneNumber || '';
+                    profileBloodGroupSelect.value = data.bloodGroup || '';
+                    profileBloodDonationInterestSelect.value = data.bloodDonationInterest || '';
+                    profileAddressInput.value = data.address || '';
+                    profileFatherNameInput.value = data.fatherName || '';
+                    profileMotherNameInput.value = data.motherName || '';
+                    profileGenderSelect.value = data.gender || '';
+                    profileOccupationInput.value = data.occupation || '';
+                    console.log("Profile data loaded:", data);
+                } else {
+                    console.log("No profile data found for this user.");
+                    // Clear fields if no data found
+                    profileNameInput.value = '';
+                    profilePhoneInput.value = '';
+                    profileBloodGroupSelect.value = '';
+                    profileBloodDonationInterestSelect.value = '';
+                    profileAddressInput.value = '';
+                    profileFatherNameInput.value = '';
+                    profileMotherNameInput.value = '';
+                    profileGenderSelect.value = '';
+                    profileOccupationInput.value = '';
+                }
+            } catch (error) {
+                console.error("Error loading profile data:", error);
+                showMessageBox(`প্রোফাইল লোড করতে ব্যর্থ: ${error.message}`); // Failed to load profile.
+            }
+        }
+
+        // Function to save user profile data to Realtime Database
+        async function saveUserProfile(uid, email) {
+            const userProfileRef = ref(database, `artifacts/${appId}/users/${uid}/user_profiles`);
+            const profileData = {
+                uid: uid,
+                email: email, // Keep email in profile data
+                name: profileNameInput.value.trim(),
+                phoneNumber: profilePhoneInput.value.trim(),
+                bloodGroup: profileBloodGroupSelect.value,
+                bloodDonationInterest: profileBloodDonationInterestSelect.value,
+                address: profileAddressInput.value.trim(),
+                fatherName: profileFatherNameInput.value.trim(),
+                motherName: profileMotherNameInput.value.trim(),
+                gender: profileGenderSelect.value,
+                occupation: profileOccupationInput.value.trim(),
+                lastUpdated: new Date().toISOString() // Track last update time
+            };
+
+            try {
+                await set(userProfileRef, profileData);
+                showMessageBox('প্রোফাইল সফলভাবে সংরক্ষণ করা হয়েছে!'); // Profile saved successfully!
+                console.log("Profile data saved:", profileData);
+            } catch (error) {
+                console.error("Error saving profile data:", error);
+                showMessageBox(`প্রোফাইল সংরক্ষণ করতে ব্যর্থ: ${error.message}`); // Failed to save profile.
+            }
+        }
+
+        // Handle initial authentication state and listen for changes
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // User is signed in
+                console.log("User is signed in:", user.email, user.uid);
+                userEmailSpan.textContent = user.email || 'Anonymous User';
+                userIdSpan.textContent = user.uid;
+                showView('profile'); // Show profile page by default when logged in
+
+                // Ensure basic user profile exists in Realtime Database
+                const userProfileRef = ref(database, `artifacts/${appId}/users/${user.uid}/user_profiles`);
+                try {
+                    const snapshot = await get(userProfileRef);
+                    if (!snapshot.exists()) {
+                        await set(userProfileRef, {
+                            uid: user.uid,
+                            email: user.email,
+                            createdAt: new Date().toISOString(),
+                            name: '',
+                            phoneNumber: '',
+                            bloodGroup: '',
+                            bloodDonationInterest: '',
+                            address: '',
+                            fatherName: '',
+                            motherName: '',
+                            gender: '',
+                            occupation: ''
+                        });
+                        console.log("Basic user profile created in Realtime Database.");
+                    }
+                    // Load profile data after ensuring basic profile exists
+                    await loadUserProfile(user.uid);
+                } catch (dbError) {
+                    console.error("Error ensuring basic user profile in Realtime Database:", dbError);
+                    showMessageBox(`Database Error: ${dbError.message}`);
+                }
+
+            } else {
+                // User is signed out
+                console.log("User is signed out.");
+                showView('login'); // Redirect to login page when logged out
+
+                // Refined logic for initial sign-in:
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    try {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                        console.log("Signed in with custom token.");
+                    } catch (error) {
+                        console.error("Error signing in with custom token (falling back to anonymous):", error);
+                        try {
+                            await signInAnonymously(auth);
+                            console.log("Signed in anonymously after custom token failure.");
+                        } catch (anonError) {
+                            console.error("Error signing in anonymously:", anonError);
+                            showMessageBox(`Authentication Error: ${anonError.message}`);
+                        }
+                    }
+                } else {
+                    try {
+                        await signInAnonymously(auth);
+                        console.log("Signed in anonymously.");
+                    } catch (error) {
+                        console.error("Error signing in anonymously:", error);
+                        showMessageBox(`Authentication Error: ${error.message}`);
+                    }
+                }
+            }
+        });
+
+        // Login functionality
+        if (loginForm) {
+            loginForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const email = loginEmailInput.value.trim();
+                const password = loginPasswordInput.value.trim();
+
+                if (email === '' || password === '') {
+                    showMessageBox('অনুগ্রহ করে আপনার ই-মেইল এবং পাসওয়ার্ড লিখুন।');
+                    return;
+                }
+
+                try {
+                    await signInWithEmailAndPassword(auth, email, password);
+                } catch (error) {
+                    console.error("Login Error:", error.code, error.message);
+                    let errorMessage = 'লগইন ব্যর্থ হয়েছে।';
+                    switch (error.code) {
+                        case 'auth/invalid-email':
+                            errorMessage = 'ভুল ই-মেইল ফরম্যাট।';
+                            break;
+                        case 'auth/user-not-found':
+                        case 'auth/wrong-password':
+                            errorMessage = 'ভুল ই-মেইল বা পাসওয়ার্ড।';
+                            break;
+                        case 'auth/too-many-requests':
+                            errorMessage = 'অনেকবার চেষ্টা করা হয়েছে। পরে আবার চেষ্টা করুন।';
+                            break;
+                        default:
+                            errorMessage = `লগইন ব্যর্থ হয়েছে: ${error.message}`;
+                            break;
+                    }
+                    showMessageBox(errorMessage);
+                }
+            });
+        }
+
+        // Sign Up functionality
+        if (signupForm) {
+            signupForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const email = signupEmailInput.value.trim();
+                const password = signupPasswordInput.value.trim();
+                const confirmPassword = signupConfirmPasswordInput.value.trim();
+
+                if (email === '' || password === '' || confirmPassword === '') {
+                    showMessageBox('সাইন আপ করতে সব ঘর পূরণ করুন।');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    showMessageBox('পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।');
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    showMessageBox('পাসওয়ার্ড মিলছে না।');
+                    return;
+                }
+
+                try {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+
+                    const userProfileRef = ref(database, `artifacts/${appId}/users/${user.uid}/user_profiles`);
+                    await set(userProfileRef, {
+                        uid: user.uid,
+                        email: user.email,
+                        createdAt: new Date().toISOString(),
+                        name: '',
+                        phoneNumber: '',
+                        bloodGroup: '',
+                        bloodDonationInterest: '',
+                        address: '',
+                        fatherName: '',
+                        motherName: '',
+                        gender: '',
+                        occupation: ''
+                    });
+
+                    showMessageBox('সাইন আপ সফল হয়েছে! এখন আপনি লগইন করতে পারবেন।');
+                } catch (error) {
+                    console.error("Sign Up Error:", error.code, error.message);
+                    let errorMessage = 'সাইন আপ ব্যর্থ হয়েছে।';
+                    switch (error.code) {
+                        case 'auth/email-already-in-use':
+                            errorMessage = 'এই ই-মেইলটি ইতিমধ্যেই ব্যবহৃত হয়েছে।';
+                            break;
+                        case 'auth/invalid-email':
+                            errorMessage = 'ভুল ই-মেইল ফরম্যাট।';
+                            break;
+                        case 'auth/weak-password':
+                            errorMessage = 'পাসওয়ার্ড খুব দুর্বল। কমপক্ষে ৬ অক্ষরের হতে হবে।';
+                            break;
+                        default:
+                            errorMessage = `সাইন আপ ব্যর্থ হয়েছে: ${error.message}`;
+                            break;
+                    }
+                    showMessageBox(errorMessage);
+                }
+            });
+        }
+
+        // Profile form submission
+        if (profileForm) {
+            profileForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const user = auth.currentUser;
+                if (user) {
+                    await saveUserProfile(user.uid, user.email);
+                } else {
+                    showMessageBox('প্রোফাইল সংরক্ষণ করতে আপনাকে লগইন করতে হবে।');
+                }
+            });
+        }
+
+        // Logout functionality
+        if (logoutButton) {
+            logoutButton.addEventListener('click', async () => {
+                try {
+                    await signOut(auth);
+                    showMessageBox('সফলভাবে লগআউট করা হয়েছে।');
+                    // onAuthStateChanged will handle showing the login view
+                } catch (error) {
+                    console.error("Logout Error:", error.message);
+                    showMessageBox(`লগআউট ব্যর্থ হয়েছে: ${error.message}`);
+                }
+            });
+        }
+
+        // View Profile button click (now simply switches to profile view if already logged in)
+        if (viewProfileButton) {
+            viewProfileButton.addEventListener('click', async () => {
+                const user = auth.currentUser;
+                if (user) {
+                    showView('profile');
+                    await loadUserProfile(user.uid);
+                } else {
+                    showMessageBox('প্রোফাইল দেখতে আপনাকে লগইন করতে হবে।');
+                }
+            });
+        }
+
+        // Toggle between login and signup views
+        if (showSignupButton) {
+            showSignupButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                showView('signup');
+            });
+        }
+
+        if (showLoginButton) {
+            showLoginButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                showView('login');
+            });
+        }
+    </script>
+</body>
+</html>
